@@ -4,26 +4,28 @@ ARG FROM
 FROM ${FROM}
 
 FROM ${FROM} AS cloudarchive-generator
-ARG RELEASE
 RUN <<EOF
   set -xe
-
   apt-get update
   apt-get install -y lsb-release
-
-  # Setup Ubuntu Cloud Archive repository
+  apt-get clean
+  rm -rf /var/lib/apt/lists/*
+EOF
+ARG RELEASE
+RUN <<EOF /bin/bash
+  set -xe
   if [ "$(lsb_release -sc)" = "focal" ]; then
-    if [ "${RELEASE}" = "wallaby" ] || [ "${RELEASE}" = "xena" ] || [ "${RELEASE}" = "yoga"]; then
+    if [[ "${RELEASE}" = "wallaby" || "${RELEASE}" = "xena" || "${RELEASE}" = "yoga" ]]; then
       echo "deb http://ubuntu-cloud.archive.canonical.com/ubuntu $(lsb_release -sc)-updates/${RELEASE} main" > /etc/apt/sources.list.d/cloudarchive.list
     else
       echo "${RELEASE} is not supported on $(lsb_release -sc)"
       exit 1
     fi
   elif [ "$(lsb_release -sc)" = "jammy" ]; then
-    if [ "${RELEASE}" = "yoga" ]; then
+    if [[ "${RELEASE}" = "yoga" ]]; then
       # NOTE(mnaser): Yoga shipped with 22.04, so no need to add an extra repository.
       echo "" > /etc/apt/sources.list.d/cloudarchive.list
-    elif [ "${RELEASE}" = "zed" ]; then
+    elif [[ "${RELEASE}" = "zed" ]]; then
       echo "deb http://ubuntu-cloud.archive.canonical.com/ubuntu $(lsb_release -sc)-updates/${RELEASE} main" > /etc/apt/sources.list.d/cloudarchive.list
     else
       echo "${RELEASE} is not supported on $(lsb_release -sc)"

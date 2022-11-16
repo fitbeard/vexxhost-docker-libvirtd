@@ -61,26 +61,3 @@ RUN <<EOF
   apt-get clean
   rm -rf /var/lib/apt/lists/*
 EOF
-
-
-# FROM ubuntu:20.04 AS wallaby
-# RUN <<EOF
-#   echo "deb http://ubuntu-cloud.archive.canonical.com/ubuntu focal-updates/wallaby main" \
-#     > /etc/apt/sources.list.d/cloudarchive.list
-# EOF
-
-# FROM ubuntu:20.04 AS xena
-# RUN <<EOF
-#   echo "deb http://ubuntu-cloud.archive.canonical.com/ubuntu focal-updates/xena main" \
-#     > /etc/apt/sources.list.d/cloudarchive.list
-# EOF
-
-# FROM ubuntu:22.04 AS yoga
-
-# FROM ubuntu:22.04 AS zed
-# RUN <<EOF
-#   echo "deb http://ubuntu-cloud.archive.canonical.com/ubuntu jammy-updates/zed main" \
-#     > /etc/apt/sources.list.d/cloudarchive.list
-# EOF
-
-# FROM ${RELEASE} AS runtime

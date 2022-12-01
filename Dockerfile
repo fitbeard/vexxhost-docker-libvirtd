@@ -63,3 +63,9 @@ RUN <<EOF
   apt-get clean
   rm -rf /var/lib/apt/lists/*
 EOF
+# NOTE(mnaser): libvirt uses system users for authentication, without a matching
+#               user, it won't be able to talk to Nova successfully.
+RUN <<EOF
+  groupadd -g 42424 nova
+  useradd -u 42424 -g nova -d /var/lib/nova -s /usr/sbin/nologin -c "Nova user" nova
+EOF

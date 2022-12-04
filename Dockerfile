@@ -3,7 +3,7 @@
 ARG FROM
 FROM ${FROM}
 
-FROM ${FROM} AS cloudarchive-generator
+FROM ${FROM} AS repository-generator
 RUN <<EOF
   set -xe
   apt-get update
@@ -36,9 +36,22 @@ RUN <<EOF /bin/bash
     exit 1
   fi
 EOF
+RUN <<EOF /bin/bash
+  set -xe
+  if [[ "${RELEASE}" = "wallaby" || "${RELEASE}" = "xena" ]]; then
+    echo "deb http://download.ceph.com/debian-pacific/ $(lsb_release -sc) main" > /etc/apt/sources.list.d/ceph.list
+  elif [[ "${RELEASE}" = "yoga" || "${RELEASE}" = "zed" ]]; then
+    echo "deb http://download.ceph.com/debian-quincy/ $(lsb_release -sc) main" > /etc/apt/sources.list.d/ceph.list
+  else
+    echo "${RELEASE} is not supported on $(lsb_release -sc)"
+    exit 1
+  fi
+EOF
 
 FROM ${FROM} AS runtime
-COPY --from=cloudarchive-generator --link /etc/apt/sources.list.d/cloudarchive.list /etc/apt/sources.list.d/cloudarchive.list
+COPY --from=repository-generator --link /etc/apt/sources.list.d/cloudarchive.list /etc/apt/sources.list.d/cloudarchive.list
+COPY ceph.gpg /etc/apt/trusted.gpg.d/ceph.gpg
+COPY --from=repository-generator --link /etc/apt/sources.list.d/ceph.list /etc/apt/sources.list.d/ceph.list
 COPY ubuntu-keyring-2012-cloud-archive.gpg /etc/apt/trusted.gpg.d/ubuntu-keyring-2012-cloud-archive.gpg
 RUN <<EOF
   set -xe

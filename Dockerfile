@@ -72,7 +72,8 @@ RUN <<EOF
     pm-utils \
     qemu-block-extra \
     qemu-efi \
-    qemu-kvm
+    qemu-kvm \
+    seabios
   apt-get clean
   rm -rf /var/lib/apt/lists/*
 EOF
